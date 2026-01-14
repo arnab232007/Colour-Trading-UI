@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jagadish Trading | Spin & Win</title>
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --green: #10b981;
+            --red: #ef4444;
+            --violet: #8b5cf6;
+            --gold: #f59e0b;
+            --neon-glow: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(16, 185, 129, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            /* Deeper, more complex background */
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 10% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
+                linear-gradient(180deg, var(--primary-bg), #020617);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* --- Mobile Container --- */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: transparent;
+            height: 100vh;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 90px; /* Space for navbar */
+        }
+        
+        /* Hide scrollbar for cleaner look */
+        .app-container::-webkit-scrollbar { display: none; }
+
+        /* --- Header --- */
+        header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* --- Balance Card --- */
+        .balance-card {
+            margin: 20px;
+            padding: 25px;
+            border-radius: 30px;
+            background: linear-gradient(160deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(30px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Subtle shine effect on card */
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        .balance-amount {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 10px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .currency { color: var(--gold); }
+
+        /* --- Game Area --- */
+        .game-section { padding: 0 20px; }
+
+        .timer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .countdown {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--gold);
+        }
+
+        /* --- THE WHEEL --- */
+        .wheel-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 35px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Outer glow behind wheel */
+            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.2));
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            z-index: 20;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(180deg, #f8fafc, #94a3b8);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        .wheel-outer-ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid rgba(255,255,255,0.05);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.5);
+            background: #0f172a;
+        }
+
+        .wheel {
+            width: 92%;
+            height: 92%;
+            border-radius: 50%;
+            transition: transform 5s cubic-bezier(0.1, 0.7, 0.1, 1); /* Smooth deceleration */
+            position: relative;
+            border: 4px solid rgba(0,0,0,0.8);
+            /* Complex Conic Gradient for Red, Green, Violet segments */
+            background: conic-gradient(
+                from 0deg,
+                var(--red) 0deg 36deg,      /* 0 - R */
+                var(--green) 36deg 72deg,   /* 1 - G */
+                var(--red) 72deg 108deg,    /* 2 - R */
+                var(--green) 108deg 144deg, /* 3 - G */
+                var(--red) 144deg 180deg,   /* 4 - R */
+                var(--violet) 180deg 216deg, /* 5 - V */
+                var(--red) 216deg 252deg,    /* 6 - R */
+                var(--green) 252deg 288deg,  /* 7 - G */
+                var(--red) 288deg 324deg,    /* 8 - R */
+                var(--green) 324deg 360deg   /* 9 - G */
+            );
+        }
+
+        /* The actual spinning animation applied by JS */
+        .wheel.spinning {
+             /* Calculates: 5 full rotations (1800deg) + a random end point */
+            transform: rotate(calc(1800deg + var(--final-angle)));
+        }
+
+        .wheel-center {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 50%;
+            z-index: 10;
+            border: 4px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* --- Betting Buttons --- */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .bet-btn {
+            border: none;
+            padding: 20px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bet-btn span:last-child { font-size: 0.7rem; opacity: 0.7; font-weight: normal; margin-top: 5px;}
+        .bet-btn:active { transform: scale(0.95); }
+
+        .btn-green { background: linear-gradient(145deg, #10b981, #047857); box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4); }
+        .btn-violet { background: linear-gradient(145deg, #8b5cf6, #6d28d9); box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.4); }
+        .btn-red { background: linear-gradient(145deg, #ef4444, #b91c1c); box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4); }
+
+
+        /* --- Records Table --- */
+        .records-container {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 30px 30px 0 0;
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            min-height: 300px;
+        }
+
+        .record-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-weight: 500;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 8px; box-shadow: 0 0 10px currentColor;}
+
+        /* --- Navbar --- */
+        .navbar {
+            position: fixed;
+            bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            width: 90%; max-width: 440px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            z-index: 200;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            gap: 6px;
+            transition: 0.3s;
+        }
+        .nav-item.active { color: var(--text-main); }
+        .nav-icon { font-size: 1.4rem; }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        .modal-content {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            padding: 30px; border-radius: 25px; text-align: center; width: 85%; max-width: 320px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--neon-glow);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from {opacity: 0; transform: scale(0.8);} to {opacity: 1; transform: scale(1);}}
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="brand">Jagadish Spot</div>
+            <div style="font-size: 1.2rem;">🔔</div>
+        </header>
+
+        <div class="balance-card">
+            <div style="color: var(--text-muted); font-size: 0.9rem; letter-spacing: 1px;">TOTAL ASSETS</div>
+            <div class="balance-amount"><span class="currency">₹</span> 12,450.00</div>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                 <button style="flex: 1; padding: 12px; background: var(--gold); color: black; border: none; border-radius: 15px; font-weight: bold;">Deposit</button>
+                 <button style="flex: 1; padding: 12px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 15px; font-weight: bold;">Withdraw</button>
+            </div>
+        </div>
+
+        <div class="game-section">
+            <div class="timer-bar">
+                <div style="color: var(--text-muted);">Period: 20231024098</div>
+                <div class="countdown">
+                    ⏱️ <span id="timer">30</span>s
+                </div>
+            </div>
+
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer"></div>
+                <div class="wheel-outer-ring">
+                    <div class="wheel" id="spinningWheel"></div>
+                    <div class="wheel-center">JAGADISH</div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="bet-btn btn-green" onclick="showModal('Green')">
+                    Join Green <span>1:2</span>
+                </button>
+                <button class="bet-btn btn-violet" onclick="showModal('Violet')">
+                    Join Violet <span>1:4.5</span>
+                </button>
+                <button class="bet-btn btn-red" onclick="showModal('Red')">
+                    Join Red <span>1:2</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="records-container">
+            <h3 style="margin-bottom: 20px;">Recent Outcomes</h3>
+             <div class="record-row">
+                <span style="color:var(--text-muted)">20231024097</span>
+                <span style="color:var(--green); font-weight:bold;">Green <span class="dot" style="background:var(--green)"></span></span>
+            </div>
+            <div class="record-row">
+                <span style="color:var(--text-muted)">20231024096</span>
+                <span style="color:var(--red); font-weight:bold;">Red <span class="dot" style="background:var(--red)"></span></span>
+            </div>
+            <div class="record-row">
+                <span style="color:var(--text-muted)">20231024095</span>
+                <span style="color:var(--violet); font-weight:bold;">Violet <span class="dot" style="background:var(--violet)"></span></span>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <a href="#" class="nav-item active"><span class="nav-icon">🏠</span>Home</a>
+        <a href="#" class="nav-item"><span class="nav-icon">🎡</span>Activity</a>
+        <a href="#" class="nav-item"><span class="nav-icon">💼</span>Wallet</a>
+        <a href="#" class="nav-item"><span class="nav-icon">👤</span>Account</a>
+    </nav>
+
+     <div class="modal" id="betModal">
+        <div class="modal-content">
+            <h2 id="modalTitle" style="margin-bottom: 15px;">Confirm Selection</h2>
+             <div style="margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 15px;">
+                Contract Amount: <span style="color: var(--gold); font-weight: bold;">₹100</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="closeModal()" style="flex: 1; padding: 15px; border-radius: 15px; border: none; background: #334155; color: white; font-weight: bold;">Cancel</button>
+                <button onclick="confirmBet()" style="flex: 1; padding: 15px; border-radius: 15px; border: none; background: var(--gold); color: #000; font-weight: bold;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Timer & Spin Logic ---
+        let timeLeft = 30; // 30 seconds for demo loop
+        const timerDisplay = document.getElementById('timer');
+        const wheel = document.getElementById('spinningWheel');
+        let isSpinning = false;
+
+        function startTimer() {
+            const countdown = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    timerDisplay.innerText = "Generating...";
+                    spinWheel();
+                } else {
+                    timerDisplay.innerText = timeLeft < 10 ? '0' + timeLeft : timeLeft;
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            // 1. Calculate a random final angle (0 to 360 degrees)
+            const randomAngle = Math.floor(Math.random() * 360);
+            
+            // 2. Set the CSS variable for the final rotation
+            // We add 1800deg (5 full spins) to ensure it spins fast before stopping
+            wheel.style.setProperty('--final-angle', randomAngle + 'deg');
+
+            // 3. Add the class to trigger the CSS transition
+            wheel.classList.add('spinning');
+
+            // 4. Wait for animation to finish (must match CSS transition time: 5s)
+            setTimeout(() => {
+                wheel.classList.remove('spinning');
+                // Reset wheel position smoothly so it doesn't snap back
+                wheel.style.transform = `rotate(${randomAngle % 360}deg)`;
+                
+                // Reset timer loop for demo
+                timeLeft = 30;
+                isSpinning = false;
+                startTimer();
+                
+                // Optional: Show result here
+                console.log("Wheel stopped at angle: " + randomAngle);
+            }, 5000); // 5 seconds match CSS
+        }
+
+        // Start the loop immediately
+        startTimer();
+
+        // --- Modal Logic (Same as before) ---
+        const modal = document.getElementById('betModal');
+        const modalTitle = document.getElementById('modalTitle');
+
+        function showModal(color) {
+            modal.style.display = 'flex';
+            modalTitle.innerText = 'Join ' + color;
+            modalTitle.style.color = color === 'Green' ? '#10b981' : color === 'Red' ? '#ef4444' : '#8b5cf6';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function confirmBet() {
+            closeModal();
+        }
+    </script>
+</body>
+</html>
