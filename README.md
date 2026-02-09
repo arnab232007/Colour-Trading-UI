@@ -2,6 +2,7 @@
 Colour Trading UI is a frontend interface built to display and interact with a colour-prediction style game dashboard. The UI showcases essential user elements like total assets, recent outcomes, and quick actions (e.g., Join Green, Join Violet, Join Red) with intuitive interaction patterns and responsive design.
 
 The focus of this deployment is on frontend experience and user engagement rather than backend game logic.
+Live Demo : https://colour-trading-ui.vercel.app/
 🚀 Features
 
 ✨ Responsive and engaging UI
